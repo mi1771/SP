@@ -1,0 +1,711 @@
+﻿<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Snoopy's Tuckshop — Pre-order & Menu</title>
+  <meta name="description"
+    content="Proudly South African tuckshop. Pre-order sandwiches, drinks, sweets and snacks for delivery." />
+  <link rel="icon" type="image/png" href="snoopy-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --background: #fdfcf9;
+      --foreground: #2e1a0b;
+      --card: #ffffff;
+      --card-foreground: #2e1a0b;
+      --muted: #f7f3ed;
+      --muted-foreground: #7a6555;
+      --border: #eedcc8;
+      --primary: #b65b2b;
+      --primary-foreground: #ffffff;
+    }
+
+    body {
+      background: var(--background);
+      color: var(--foreground);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: 'Poppins', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif
+    }
+
+    /* elegant blocky grid background with radial fade */
+    .pattern-grid {
+      background-color: var(--background);
+      background-image:
+        radial-gradient(circle at center, transparent 15%, var(--background) 85%),
+        linear-gradient(to right, rgba(182, 91, 43, 0.06) 3px, transparent 3px),
+        linear-gradient(to bottom, rgba(182, 91, 43, 0.06) 3px, transparent 3px);
+      background-size: 100% 100%, 56px 56px, 56px 56px;
+      background-attachment: fixed;
+    }
+
+    .bg-background {
+      background: var(--background);
+    }
+
+    .bg-card {
+      background: var(--card);
+    }
+
+    .bg-muted {
+      background: var(--muted);
+    }
+
+    .bg-foreground {
+      background: var(--foreground);
+    }
+
+    .bg-primary {
+      background: var(--primary);
+    }
+
+    .text-foreground {
+      color: var(--foreground);
+    }
+
+    .text-muted-foreground {
+      color: var(--muted-foreground);
+    }
+
+    .text-card-foreground {
+      color: var(--card-foreground);
+    }
+
+    .text-background {
+      color: var(--background);
+    }
+
+    .text-primary-foreground {
+      color: var(--primary-foreground);
+    }
+
+    .border-border {
+      border-color: var(--border);
+    }
+
+    .border-foreground {
+      border-color: var(--foreground);
+    }
+
+    .bg-background\/95 {
+      background: rgba(253, 252, 249, .95);
+    }
+
+    .hover\:bg-primary\/90:hover {
+      background: #9e4b1f;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(-25%);
+        animation-timing-function: cubic-bezier(.8, 0, 1, 1)
+      }
+
+      50% {
+        transform: none;
+        animation-timing-function: cubic-bezier(0, 0, .2, 1)
+      }
+    }
+
+    .animate-bounce {
+      animation: bounce 1s infinite;
+    }
+
+    @keyframes pulse {
+      50% {
+        opacity: .5
+      }
+    }
+
+    .animate-pulse {
+      animation: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite;
+    }
+
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(253, 252, 249, 0.96);
+      backdrop-filter: blur(6px);
+      transition: opacity .45s ease, visibility .45s ease;
+      visibility: visible;
+    }
+
+    .loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    .loading-card {
+      width: min(420px, calc(100%-40px));
+      padding: 32px 28px;
+      border-radius: 32px;
+      border: 1px solid var(--border);
+      box-shadow: 0 32px 80px rgba(46, 26, 11, 0.12);
+      background: var(--card);
+      transition: transform .45s ease, opacity .45s ease;
+    }
+
+    .loading-screen.hidden .loading-card {
+      transform: translateY(12px);
+      opacity: 0;
+    }
+
+    #app {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+
+    #app.is-ready {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .loading-card h1 {
+      margin-top: 18px;
+      margin-bottom: 6px;
+      font-size: 1.75rem;
+    }
+
+    .loading-card h1 {
+      margin-top: 18px;
+      margin-bottom: 6px;
+      font-size: 1.75rem;
+    }
+
+    .loading-card p {
+      color: var(--muted-foreground);
+      font-size: .95rem;
+    }
+
+    .loading-dots {
+      display: inline-flex;
+      gap: .55rem;
+      margin-top: 16px;
+    }
+
+    .loading-dots span {
+      display: block;
+      width: 11px;
+      height: 11px;
+      border-radius: 9999px;
+      background: var(--foreground);
+      animation: bounce .9s infinite ease;
+    }
+
+    .loading-dots span:nth-child(1) {
+      animation-delay: -0.24s;
+    }
+
+    .loading-dots span:nth-child(2) {
+      animation-delay: -0.12s;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="splash" class="loading-screen">
+    <div class="loading-card text-center">
+      <img src="snoopy-logo.png" alt="Snoopies Tuckshop" width="90" height="90"
+        class="mx-auto mb-4 h-20 w-20 rounded-full border border-border bg-white object-contain p-2 shadow-sm" />
+      <h1 class="font-bold">Snoopies Tuckshop</h1>
+      <p class="mt-2 uppercase tracking-[0.25em] text-xs text-muted-foreground">Loading your menu…</p>
+      <div class="loading-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+  <div id="app" class="min-h-screen bg-background pattern-grid">
+    <header class="sticky top-0 z-20 border-b border-border bg-primary backdrop-blur">
+      <div class="mx-auto relative flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+        <div class="flex items-center gap-3">
+          <img src="snoopy-logo.png" alt="Snoopies Tuckshop logo" width="48" height="48"
+            class="h-12 w-12 rounded-full border border-border bg-white object-contain p-1 shadow-sm" />
+          <div>
+            <h1 class="text-xl font-bold tracking-tight text-primary-foreground sm:text-2xl">Snoopies Tuckshop</h1>
+            <p class="text-[10px] uppercase tracking-widest text-primary-foreground/90 sm:text-xs">Pre-order &amp;
+              Delivery</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <button id="menuBtn" aria-expanded="false"
+              class="inline-flex items-center justify-center rounded-md p-2 text-primary-foreground hover:bg-muted">
+              <span class="sr-only">Open menu</span>
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                </path>
+              </svg>
+            </button>
+            <div id="menuDropdown"
+              class="hidden absolute right-0 mt-2 w-56 overflow-hidden rounded-md border border-border bg-white shadow-lg">
+              <a href="#cat-Food" class="block px-4 py-3 text-sm text-foreground hover:bg-muted"
+                onclick="closeAllMenus()">Food</a>
+              <a href="#cat-Drinks" class="block px-4 py-3 text-sm text-foreground hover:bg-muted"
+                onclick="closeAllMenus()">Drinks</a>
+              <a href="#cat-Snacks" class="block px-4 py-3 text-sm text-foreground hover:bg-muted"
+                onclick="closeAllMenus()">Snacks</a>
+              <a id="menuContactUs" href="#contact-section"
+                class="block px-4 py-3 text-sm text-foreground hover:bg-muted">Contact Us</a>
+              <a href="orders.html" class="block px-4 py-3 text-sm text-foreground hover:bg-muted">My Orders</a>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 rounded-full border border-border bg-card px-4 py-2 shadow-sm">
+            <span id="itemCount" class="hidden text-sm text-muted-foreground sm:inline">0 items</span>
+            <span class="hidden h-4 w-px bg-border sm:inline-block"></span>
+            <span id="totalTop" class="text-sm font-semibold text-foreground sm:text-base">R 0.00</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-8">
+      <section
+        class="mb-8 overflow-hidden rounded-[2rem] border border-[#ecd8c8] bg-gradient-to-br from-[#fff3e6] via-[#fffaf4] to-[#ffe8d2] p-6 shadow-[0_20px_60px_rgba(171,101,47,0.14)] sm:p-8 lg:p-10">
+        <div class="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          <div class="text-center lg:text-left">
+            <p
+              class="mb-3 inline-flex rounded-full border border-[#f2d8bf] bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#a15622]">
+              Freshly made, delivered fast</p>
+            <h2 class="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">South African comfort food,
+              served with a smile.</h2>
+            <p class="mx-auto mt-4 max-w-xl text-base leading-7 text-[#6d5847] sm:text-lg lg:mx-0">From toasted
+              favourites to chilled drinks and sweet treats, Snoopies Tuckshop makes every lunch break feel a little
+              more special.</p>
+            <div class="mt-6 flex flex-wrap justify-center gap-3 lg:justify-start">
+              <a href="#panels"
+                class="rounded-full bg-[#b65b2b] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#9d4b1f]">Browse
+                the menu</a>
+              <a href="#summary"
+                class="rounded-full border border-[#e3c9ab] bg-white/80 px-5 py-2.5 text-sm font-semibold text-[#7a4f2e] transition hover:border-[#d3b08f] hover:bg-[#fff7ed]">View
+                your order</a>
+            </div>
+          </div>
+          <div class="rounded-[1.5rem] border border-[#efd9c3] bg-white/80 p-4 shadow-sm">
+            <div class="rounded-[1.25rem] bg-gradient-to-br from-[#fff7ea] to-[#fde3c3] p-5 text-center">
+              <img src="snoopy-logo.png" alt="Snoopies Tuckshop logo"
+                class="mx-auto h-24 w-24 rounded-full border border-[#ecd8c8] bg-white object-contain p-3 shadow-sm" />
+              <h3 class="mt-4 text-xl font-semibold text-foreground">Tuckshop favourites</h3>
+              <p class="mt-2 text-sm leading-6 text-[#6d5847]">Warm meals, bold snacks and refreshing drinks ready for
+                pre-order and delivery.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Category Navigation Banner Blocks -->
+      <div class="mb-8 space-y-4">
+        <!-- Food banner block -->
+        <a href="#cat-Food"
+          class="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-border bg-card p-6 shadow-[0_4px_20px_rgba(182,91,43,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(182,91,43,0.08)] hover:border-primary/30">
+          <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+            <div
+              class="h-16 w-16 shrink-0 rounded-xl bg-[#fff7ea] flex items-center justify-center text-3xl shadow-sm border border-border">
+              🍔</div>
+            <div>
+              <h3 class="text-lg font-bold text-foreground">Food &amp; Meals</h3>
+              <p class="text-sm text-muted-foreground">South African comfort dishes, sandwiches, wraps, bunny chows, and
+                toasted favorites.</p>
+            </div>
+          </div>
+          <span class="inline-flex items-center gap-1 text-sm font-semibold text-primary">Browse Food &rarr;</span>
+        </a>
+
+        <!-- Drinks banner block -->
+        <a href="#cat-Drinks"
+          class="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-border bg-card p-6 shadow-[0_4px_20px_rgba(182,91,43,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(182,91,43,0.08)] hover:border-primary/30">
+          <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+            <div
+              class="h-16 w-16 shrink-0 rounded-xl bg-[#fff3e6] flex items-center justify-center text-3xl shadow-sm border border-border">
+              🥤</div>
+            <div>
+              <h3 class="text-lg font-bold text-foreground">Drinks &amp; Beverages</h3>
+              <p class="text-sm text-muted-foreground">Chilled sodas, mineral water, juices, and South African
+                milkshakes (Steri Stumpie).</p>
+            </div>
+          </div>
+          <span class="inline-flex items-center gap-1 text-sm font-semibold text-primary">Browse Drinks &rarr;</span>
+        </a>
+
+        <!-- Snacks banner block -->
+        <a href="#cat-Snacks"
+          class="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-border bg-card p-6 shadow-[0_4px_20px_rgba(182,91,43,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(182,91,43,0.08)] hover:border-primary/30">
+          <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+            <div
+              class="h-16 w-16 shrink-0 rounded-xl bg-[#fffaf4] flex items-center justify-center text-3xl shadow-sm border border-border">
+              🍟</div>
+            <div>
+              <h3 class="text-lg font-bold text-foreground">Snacks &amp; Sweets</h3>
+              <p class="text-sm text-muted-foreground">Simba chips, Nik Naks, spicy biltong, chocolates, jelly tots, and
+                sweet candies.</p>
+            </div>
+          </div>
+          <span class="inline-flex items-center gap-1 text-sm font-semibold text-primary">Browse Snacks &rarr;</span>
+        </a>
+      </div>
+      <div id="filters" class="mb-6 flex flex-wrap gap-2"></div>
+      <div id="panels" class="space-y-6"></div>
+      <div id="summary"></div>
+
+      <!-- Contact Us Section -->
+      <section id="contact-section"
+        class="mt-12 rounded-[1.75rem] border border-border bg-card p-6 shadow-[0_10px_30px_rgba(60,35,20,0.04)] sm:p-8">
+        <h3 class="text-xl font-bold text-foreground">Contact Us</h3>
+        <p class="mt-2 text-sm text-muted-foreground">Got questions about your pre-order or delivery? Get in touch with
+          us!</p>
+        <div class="mt-6">
+          <div class="rounded-xl border border-border bg-background p-4">
+            <h4 class="text-sm font-semibold text-foreground">Direct Contact Details</h4>
+            <p class="mt-2 text-sm text-muted-foreground">📧 Email: <a href="mailto:hello@snoopies.co.za"
+                class="font-medium text-primary underline">hello@snoopies.co.za</a></p>
+            <p class="mt-1 text-sm text-muted-foreground">📞 Phone: <span class="font-semibold text-foreground">012 345
+                6789</span></p>
+            <p class="mt-1 text-sm text-muted-foreground">🕒 Hours: Mon - Fri (08:00 - 16:00)</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact Trigger removed -->
+    </main>
+
+    <footer class="mt-16 border-t border-border bg-primary py-8 text-center text-sm text-primary-foreground">
+      <p>© <span id="yr"></span> Snoopies Tuckshop. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- Fixed bottom checkout bar -->
+  <div id="bottomBar"
+    class="fixed bottom-4 left-1/2 z-30 w-[min(980px,calc(100%-48px))] -translate-x-1/2 rounded-2xl border border-border bg-primary p-3 shadow-lg text-primary-foreground">
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-4">
+        <div class="rounded-md border border-border bg-white/10 px-3 py-2 text-sm text-primary-foreground">
+          <span id="bottomCount">0 items</span> • <span id="bottomTotal">R 0.00</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a id="checkoutLink" href="#summary"
+          class="rounded-lg bg-white/95 px-4 py-2 text-sm font-semibold text-[#7a4f2e]">Checkout</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals: Contact, More Info, Checkout -->
+  <div id="contactModal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black/30">
+    <div class="mx-4 max-w-lg rounded-lg bg-white p-6">
+      <div class="flex items-start justify-between">
+        <h3 class="text-lg font-semibold">Contact Us</h3>
+        <button onclick="closeModal('contactModal')" class="text-muted-foreground">✕</button>
+      </div>
+      <p class="mt-3 text-sm text-muted-foreground">Email: hello@snoopies.example · Phone: 012 345 6789</p>
+      <p class="mt-2 text-sm text-muted-foreground">Open hours: Mon-Fri 08:00–16:00</p>
+    </div>
+  </div>
+
+  <div id="infoModal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black/30">
+    <div class="mx-4 max-w-lg rounded-lg bg-white p-6">
+      <div class="flex items-start justify-between">
+        <h3 class="text-lg font-semibold">More Information</h3>
+        <button onclick="closeModal('infoModal')" class="text-muted-foreground">✕</button>
+      </div>
+      <p class="mt-3 text-sm text-muted-foreground">We offer pre-orders and local delivery. Minimum order R 40. Delivery
+        within 5km.</p>
+    </div>
+  </div>
+
+  <div id="checkoutModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4 py-6">
+    <div class="mx-auto w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+      <div class="flex items-start justify-between">
+        <h3 class="text-lg font-semibold">Checkout — Submit Order</h3>
+        <button onclick="closeModal('checkoutModal')" class="text-muted-foreground">✕</button>
+      </div>
+      <form id="checkoutForm" action="https://api.web3forms.com/submit" method="POST" class="mt-4 grid gap-3">
+        <input type="hidden" name="access_key" value="c2410d9a-d9b7-4b55-819b-e7b041577b5b" />
+        <input id="custNameSurname" name="name" type="text" placeholder="Name and Surname"
+          class="rounded-md border px-3 py-2" required />
+        <input id="custGradeClass" name="Class & Grade" type="text" placeholder="Grade and Class"
+          class="rounded-md border px-3 py-2" required />
+        <input id="custEmail" name="email" type="email" placeholder="Email address"
+          class="rounded-md border px-3 py-2" required />
+        <div class="flex items-center gap-3">
+          <button id="submitOrder" type="submit"
+            class="w-full rounded-lg bg-primary py-2 text-base font-semibold text-primary-foreground">Submit
+            Order</button>
+        </div>
+        <p id="checkoutMsg" class="mt-2 text-sm text-muted-foreground"></p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const menuItems = [
+      { id: "coke", name: "Coca-Cola 440ml", price: 18, category: "Drinks", image: "coke.jpg" },
+      { id: "sprite", name: "Sprite 440ml", price: 18, category: "Drinks", image: "fanta.jpg" },
+      { id: "fanta", name: "Fanta Orange 440ml", price: 18, category: "Drinks", image: "fanta.jpg" },
+      { id: "stoney", name: "Stoney Ginger Beer", price: 20, category: "Drinks", image: "stoney.jpg" },
+      { id: "iron-brew", name: "Sparletta Iron Brew", price: 18, category: "Drinks", image: "iron-brew.jpg" },
+      { id: "cream-soda", name: "Cream Soda 440ml", price: 18, category: "Drinks", image: "cream-soda.jpg" },
+      { id: "steri-stumpie", name: "Steri Stumpie Chocolate", price: 22, category: "Drinks", image: "steri-stumpie.jpg" },
+      { id: "liqui-fruit", name: "Liqui-Fruit Orange", price: 20, category: "Drinks", image: "liqui-fruit.jpg" },
+      { id: "rooibos-ice", name: "Rooibos Iced Tea", price: 22, category: "Drinks", image: "rooibos-ice.jpg" },
+      { id: "appletiser", name: "Appletiser 330ml", price: 25, category: "Drinks", image: "appletiser.jpg" },
+      { id: "water", name: "Bottled Water 500ml", price: 12, category: "Drinks", image: "water.jpg" },
+      { id: "wine-gums", name: "Maynards Wine Gums", price: 25, category: "Snacks", image: "wine-gums.jpg" },
+      { id: "fizzers", name: "Beacon Fizzers", price: 8, category: "Snacks", image: "fizzers.jpg" },
+      { id: "wilsons", name: "Wilson's XXX Mints", price: 10, category: "Snacks", image: "wilsons.jpg" },
+      { id: "jelly-tots", name: "Beacon Jelly Tots", price: 15, category: "Snacks", image: "jelly-tots.jpg" },
+      { id: "lunch-bar", name: "Cadbury Lunch Bar", price: 18, category: "Snacks", image: "lunch-bar.jpg" },
+      { id: "sour-worms", name: "Sharks Sour Worms", price: 15, category: "Snacks", image: "sour-worms.jpg" },
+      { id: "simba", name: "Simba Chips (Mrs Ball's)", price: 18, category: "Snacks", image: "simba.jpg" },
+      { id: "nik-naks", name: "Nik Naks Cheese", price: 15, category: "Snacks", image: "nik-naks.jpg" },
+      { id: "ghost-pops", name: "Ghost Pops", price: 12, category: "Snacks", image: "sour-worms.jpg" },
+      { id: "biltong", name: "Biltong 50g", price: 45, category: "Snacks", image: "biltong.jpg" },
+      { id: "fritos", name: "Fritos Corn Chips", price: 12, category: "Snacks", image: "fritos.jpg" },
+      { id: "chicken-mayo", name: "Chicken Mayo Roll", price: 48, category: "Food", image: "chicken-mayo.jpg" },
+      { id: "ham-cheese", name: "Ham & Cheese Sandwich", price: 45, category: "Food", image: "ham-cheese.jpg" },
+      { id: "tuna", name: "Tuna Mayo Sandwich", price: 50, category: "Food", image: "tuna.jpg" },
+      { id: "toastie", name: "Cheese & Tomato Toastie", price: 40, category: "Food", image: "toastie.jpg" },
+      { id: "wrap", name: "Chicken Wrap", price: 55, category: "Food", image: "wrap.jpg" },
+      { id: "boerie", name: "Boerewors Roll", price: 55, category: "Food", image: "boerie.jpg" },
+      { id: "vetkoek", name: "Vetkoek & Mince", price: 45, category: "Food", image: "vetkoek.jpg" },
+      { id: "bunny-chow", name: "Mini Bunny Chow", price: 65, category: "Food", image: "bunny-chow.jpg" },
+      { id: "beef-pie", name: "Beef Pie", price: 35, category: "Food", image: "beef-pie.jpg" },
+      { id: "russian-chips", name: "Russian & Chips", price: 60, category: "Food", image: "russian-chips.jpg" },
+    ];
+    const categories = ["Food", "Drinks", "Snacks"];
+    const cart = {}; let selectedCategory = "All";
+    const fmt = c => `R ${(c / 100).toFixed(2)}`;
+    const esc = s => s.replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+
+    function render() {
+      // category links
+      const filters = document.getElementById('filters');
+      filters.innerHTML = ["All", ...categories].map(c => {
+        const active = selectedCategory === c;
+        const href = c === 'All' ? '#panels' : `#cat-${c}`;
+        return `<a href="${href}" data-cat="${c}" aria-pressed="${active}" class="rounded-full px-4 py-2 text-sm font-semibold transition-all ${active ? 'bg-[#b65b2b] text-white shadow-sm' : 'border border-transparent bg-transparent text-[#6f5038] hover:bg-[#f9e7d4]'}">${c}</a>`;
+      }).join('');
+      filters.querySelectorAll('a').forEach(link => link.onclick = (e) => { e.preventDefault(); selectedCategory = link.dataset.cat; render(); if (link.dataset.cat !== 'All') { const target = document.getElementById(`cat-${link.dataset.cat}`); if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
+
+      // panels
+      const panels = document.getElementById('panels');
+      panels.innerHTML = categories.filter(c => selectedCategory === 'All' || selectedCategory === c).map(cat => {
+        const items = menuItems.filter(i => i.category === cat).map(item => {
+          const qty = cart[item.id] || 0;
+          const ctrl = qty === 0
+            ? `<button data-add="${item.id}" aria-label="Add ${esc(item.name)}" class="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">Add</button>`
+            : `<div class="flex items-center gap-2 rounded-md border border-border bg-background">
+             <button data-remove="${item.id}" class="px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted">−</button>
+             <span class="min-w-[1.5ch] text-center text-sm font-semibold">${qty}</span>
+             <button data-add="${item.id}" class="px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted">+</button>
+           </div>`;
+          return `<div class="group rounded-xl border border-border bg-background p-4 transition-all duration-300 hover:shadow-md hover:border-primary/30">
+        <div class="aspect-square w-full overflow-hidden rounded-lg bg-white border border-border">
+          <img src="${item.image}" alt="${esc(item.name)}" loading="lazy" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.onerror=null; this.src='snoopy-logo.png';" />
+        </div>
+        <div class="mt-4 space-y-3 text-left">
+          <h4 class="text-base font-semibold leading-snug text-card-foreground">${esc(item.name)}</h4>
+          <span class="text-xs uppercase tracking-wider text-muted-foreground">${esc(item.category)}</span>
+          <div class="flex items-center justify-between gap-3">
+            <span class="text-lg font-bold text-foreground">${fmt(item.price * 100)}</span>
+            <div class="shrink-0">
+              ${ctrl}
+            </div>
+          </div>
+        </div>
+      </div>`;
+        }).join('');
+        return `<section id="cat-${cat}" class="rounded-[1.75rem] border border-[#ecd8c8] bg-white/70 p-5 shadow-[0_10px_30px_rgba(60,35,20,0.05)] sm:p-6">
+      <div class="mb-4 flex items-center gap-3">
+        <h3 class="text-xl font-bold text-foreground">${cat}</h3>
+        <div class="h-px flex-1 bg-border"></div>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">${items}</div>
+    </section>`;
+      }).join('');
+      panels.querySelectorAll('[data-add]').forEach(b => b.onclick = () => { const id = b.dataset.add; cart[id] = (cart[id] || 0) + 1; render(); });
+      panels.querySelectorAll('[data-remove]').forEach(b => b.onclick = () => { const id = b.dataset.remove; if (!cart[id]) return; cart[id]--; if (!cart[id]) delete cart[id]; render(); });
+
+      // totals & summary
+      const totalCents = Object.entries(cart).reduce((s, [id, q]) => { const it = menuItems.find(m => m.id === id); return it ? s + it.price * q * 100 : s; }, 0);
+      const count = Object.values(cart).reduce((s, q) => s + q, 0);
+      document.getElementById('itemCount').textContent = `${count} ${count === 1 ? 'item' : 'items'}`;
+      document.getElementById('totalTop').textContent = fmt(totalCents);
+
+      const summary = document.getElementById('summary');
+      if (count === 0) { summary.innerHTML = ''; saveCart(); return; }
+      const rows = Object.entries(cart).map(([id, q]) => {
+        const it = menuItems.find(m => m.id === id);
+        return `<li class="flex items-center justify-between text-sm"><span class="text-muted-foreground">${esc(it.name)} × ${q}</span><span class="font-medium text-foreground">${fmt(it.price * q * 100)}</span></li>`;
+      }).join('');
+      summary.innerHTML = `<div class="mt-12 rounded-[1.5rem] border border-[#ecd8c8] bg-gradient-to-br from-[#fff7ef] to-[#fdf3e7] p-6 shadow-[0_10px_30px_rgba(60,35,20,0.08)]">
+    <h3 class="text-lg font-semibold text-foreground">Your order</h3>
+    <ul class="mt-4 space-y-2">${rows}</ul>
+    <div class="mt-4 flex items-center justify-between border-t border-[#ecd8c8] pt-4">
+      <span class="text-base font-semibold text-foreground">Total</span>
+      <span class="text-2xl font-bold text-foreground">${fmt(totalCents)}</span>
+    </div>
+    <button id="place" type="button" class="mt-6 w-full rounded-lg bg-primary py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90">Place pre-order</button>
+  </div>`;
+      saveCart();
+      const placeBtn = document.getElementById('place');
+      if (placeBtn) placeBtn.onclick = () => openCheckoutModal();
+    }
+
+    // Modal helpers
+    function openModal(id) { const el = document.getElementById(id); if (!el) return; el.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+    function closeModal(id) { const el = document.getElementById(id); if (!el) return; el.classList.add('hidden'); document.body.style.overflow = ''; }
+
+    // Menu toggle and menu links — simple, compatible implementation
+    const menuBtn = document.getElementById('menuBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
+    function closeAllMenus() { if (!menuDropdown) return; menuDropdown.classList.add('hidden'); if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false'); }
+    if (menuBtn && menuDropdown) {
+      menuBtn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); const isHidden = menuDropdown.classList.contains('hidden'); if (isHidden) { menuDropdown.classList.remove('hidden'); this.setAttribute('aria-expanded', 'true'); } else { closeAllMenus(); } });
+      document.addEventListener('click', function (e) { if (menuDropdown.classList.contains('hidden')) return; if (!menuDropdown.contains(e.target) && !menuBtn.contains(e.target)) { closeAllMenus(); } });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAllMenus(); });
+    }
+
+    // Contact Us trigger function
+    function handleContactUs(e) {
+      if (e) e.preventDefault();
+      closeAllMenus();
+      const target = document.getElementById('contact-section');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    // contactUsBtn removed from DOM; no click listener needed
+
+    const menuContactUs = document.getElementById('menuContactUs');
+    if (menuContactUs) menuContactUs.addEventListener('click', handleContactUs);
+
+    // Submit order handler
+    const WEB3FORMS_ACCESS_KEY = 'c2410d9a-d9b7-4b55-819b-e7b041577b5b';
+
+    function submitOrder(e) {
+      if (e) e.preventDefault();
+      const nameSurname = document.getElementById('custNameSurname').value.trim();
+      const gradeClass = document.getElementById('custGradeClass').value.trim();
+      const email = document.getElementById('custEmail').value.trim();
+      const msg = document.getElementById('checkoutMsg');
+      if (Object.keys(cart).length === 0) { msg.textContent = 'Your cart is empty.'; return; }
+      if (!nameSurname || !gradeClass || !email) { msg.textContent = 'Please complete all fields.'; return; }
+
+      const totalCents = Object.entries(cart).reduce((s, [id, q]) => { const it = menuItems.find(m => m.id === id); return it ? s + it.price * q * 100 : s; }, 0);
+      const itemLines = Object.entries(cart).map(([id, q]) => { const it = menuItems.find(m => m.id === id); return `${q} x ${it.name} (${fmt(it.price * q * 100)})`; }).join('\n');
+      const subject = `Pre-order request from ${nameSurname}`;
+      const message = `Customer: ${nameSurname}\nGrade/Class: ${gradeClass}\nEmail: ${email}\n\nOrder:\n${itemLines || 'No items'}\n\nTotal: ${fmt(totalCents)}`;
+
+      msg.textContent = 'Sending your order…';
+
+      const form = document.getElementById('checkoutForm');
+      const formData = new FormData(form);
+      formData.set('access_key', WEB3FORMS_ACCESS_KEY);
+      formData.set('message', message);
+
+      const object = Object.fromEntries(formData);
+      const json = JSON.stringify(object);
+
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: json
+      })
+        .then(async response => {
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || !data.success) {
+            throw new Error(data.message || 'Submission failed');
+          }
+          for (const k of Object.keys(cart)) delete cart[k];
+          render();
+          if (form) form.reset();
+          if (msg) msg.textContent = 'Order sent successfully — thank you!';
+          setTimeout(() => { closeModal('checkoutModal'); if (msg) msg.textContent = ''; }, 1400);
+        })
+        .catch(err => {
+          console.error(err);
+          if (msg) msg.textContent = 'Sorry, the order could not be sent right now.';
+        });
+    }
+
+    document.getElementById('checkoutForm').addEventListener('submit', submitOrder);
+
+    function hideSplash() { const splash = document.getElementById('splash'); const app = document.getElementById('app'); if (!splash) return; if (app) app.classList.add('is-ready'); splash.classList.add('hidden'); setTimeout(() => splash.remove(), 450); }
+    document.getElementById('yr').textContent = new Date().getFullYear();
+    render();
+    if (document.readyState === 'complete') {
+      setTimeout(hideSplash, 1600);
+    } else {
+      window.addEventListener('load', () => setTimeout(hideSplash, 1600));
+    }
+    // update bottom bar
+    function updateBottomBar() {
+      const totalCents = Object.entries(cart).reduce((s, [id, q]) => { const it = menuItems.find(m => m.id === id); return it ? s + it.price * q * 100 : s; }, 0);
+      const count = Object.values(cart).reduce((s, q) => s + q, 0);
+      document.getElementById('bottomCount').textContent = `${count} ${count === 1 ? 'item' : 'items'}`;
+      document.getElementById('bottomTotal').textContent = fmt(totalCents);
+      document.getElementById('itemCount').textContent = `${count} ${count === 1 ? 'item' : 'items'}`;
+      document.getElementById('totalTop').textContent = fmt(totalCents);
+      updateCheckoutAvailability();
+    }
+    const obs = new MutationObserver(() => updateBottomBar()); obs.observe(document.getElementById('summary'), { childList: true, subtree: true });
+    // also call after render
+    const origRender = render; render = () => { origRender(); updateBottomBar(); }; render();
+
+    function isCheckoutEnabled() {
+      return Object.keys(cart).length > 0;
+    }
+    function updateCheckoutAvailability() {
+      const el = document.getElementById('checkoutLink'); if (!el) return;
+      if (isCheckoutEnabled()) { el.classList.remove('opacity-50', 'pointer-events-none'); el.removeAttribute('aria-disabled'); }
+      else { el.classList.add('opacity-50', 'pointer-events-none'); el.setAttribute('aria-disabled', 'true'); }
+    }
+
+    function openCheckoutModal(e) {
+      if (e) e.preventDefault();
+      if (!isCheckoutEnabled()) return;
+
+      // Calculate total in Rands
+      const totalCents = Object.entries(cart).reduce((s, [id, q]) => { const it = menuItems.find(m => m.id === id); return it ? s + it.price * q * 100 : s; }, 0);
+      const cartTotal = totalCents / 100;
+
+      // Redirect to the Yoco sandbox page with the total as a URL parameter
+      window.location.href = 'checkout.html?total=' + cartTotal.toFixed(2);
+    }
+
+    function saveCart() { sessionStorage.setItem('snoop_cart', JSON.stringify(cart)); sessionStorage.setItem('snoop_menu', JSON.stringify(menuItems)); }
+    const checkoutLinkEl = document.getElementById('checkoutLink');
+    if (checkoutLinkEl) {
+      checkoutLinkEl.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.getElementById('summary');
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Orders — Snoopy's Tuckshop</title>
+  <meta name="description" content="View your order history at Snoopy's Tuckshop." />
+  <link rel="icon" type="image/png" href="snoopy-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --background: #fdfcf9;
+      --foreground: #2e1a0b;
+      --card: #ffffff;
+      --card-foreground: #2e1a0b;
+      --muted: #f7f3ed;
+      --muted-foreground: #7a6555;
+      --border: #eedcc8;
+      --primary: #b65b2b;
+      --primary-foreground: #ffffff;
+      --success: #1b5e20;
+      --success-bg: #e8f5e9;
+      --success-border: #c8e6c9;
+    }
+
+    body {
+      background: var(--background);
+      color: var(--foreground);
+      font-family: 'Poppins', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Elegant blocky grid background with radial fade */
+    .pattern-grid {
+      background-color: var(--background);
+      background-image:
+        radial-gradient(circle at center, transparent 15%, var(--background) 85%),
+        linear-gradient(to right, rgba(182, 91, 43, 0.06) 3px, transparent 3px),
+        linear-gradient(to bottom, rgba(182, 91, 43, 0.06) 3px, transparent 3px);
+      background-size: 100% 100%, 56px 56px, 56px 56px;
+      background-attachment: fixed;
+    }
+
+    .bg-background {
+      background: var(--background);
+    }
+
+    .bg-card {
+      background: var(--card);
+    }
+
+    .border-border {
+      border-color: var(--border);
+    }
+
+    .text-muted-foreground {
+      color: var(--muted-foreground);
+    }
+
+    .bg-primary {
+      background: var(--primary);
+    }
+
+    .text-primary-foreground {
+      color: var(--primary-foreground);
+    }
+
+    /* Card Transitions & Hover Rise */
+    .order-card {
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .order-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(171, 101, 47, 0.08);
+      border-color: rgba(182, 91, 43, 0.3);
+    }
+
+    /* Back Button Micro-animation */
+    .back-btn-arrow {
+      transition: transform 0.2s ease;
+    }
+
+    .back-btn:hover .back-btn-arrow {
+      transform: translateX(-4px);
+    }
+
+    /* Copy Button Tooltip */
+    .copy-btn {
+      position: relative;
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: var(--foreground);
+      color: var(--background);
+      font-size: 10px;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(46, 26, 11, 0.15);
+    }
+
+    .tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 4px;
+      border-style: solid;
+      border-color: var(--foreground) transparent transparent transparent;
+    }
+
+    .copy-btn:hover .tooltip,
+    .tooltip.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-background pattern-grid">
+  <!-- Header -->
+  <header class="sticky top-0 z-20 border-b border-border bg-primary/95 backdrop-blur shadow-sm">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+      <div class="flex items-center gap-3">
+        <img src="snoopy-logo.png" alt="Snoopies Tuckshop logo" width="48" height="48"
+          class="h-12 w-12 rounded-full border border-border bg-white object-contain p-1 shadow-sm" />
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-primary-foreground sm:text-2xl">My Orders</h1>
+          <p class="text-[10px] uppercase tracking-widest text-primary-foreground/90 sm:text-xs">Snoopies Tuckshop History</p>
+        </div>
+      </div>
+      <div>
+        <a href="index.html"
+          class="back-btn inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-sm font-semibold text-[#7a4f2e] transition hover:bg-white shadow-sm">
+          <span class="back-btn-arrow">&larr;</span> Menu
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="mx-auto max-w-5xl px-4 py-8">
+
+    <!-- Stat Dashboard Section -->
+    <section id="statsSection" class="hidden mb-8 grid grid-cols-2 gap-4">
+      <div class="rounded-2xl border border-border bg-white p-5 shadow-[0_4px_20px_rgba(182,91,43,0.02)] text-center sm:text-left">
+        <p class="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Total Pre-orders</p>
+        <h3 id="statTotalCount" class="mt-2 text-2xl font-bold text-foreground sm:text-3xl">0</h3>
+      </div>
+      <div class="rounded-2xl border border-border bg-white p-5 shadow-[0_4px_20px_rgba(182,91,43,0.02)] text-center sm:text-left">
+        <p class="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Total Amount Spent</p>
+        <h3 id="statTotalSpent" class="mt-2 text-2xl font-bold text-foreground sm:text-3xl">R 0.00</h3>
+      </div>
+    </section>
+
+    <!-- Clear all container -->
+    <div id="clearAllContainer" class="hidden mb-4 flex justify-end">
+      <button onclick="clearAllOrders()" class="text-xs font-semibold text-red-600 hover:text-red-800 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-red-200 bg-red-50 hover:bg-red-100 shadow-sm" title="Delete all order history">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+        Clear All History
+      </button>
+    </div>
+
+    <!-- Orders Grid & Empty State Container -->
+    <div id="ordersContainer">
+      <!-- Dynamically filled by JS -->
+    </div>
+
+  </main>
+
+  <footer class="mt-20 border-t border-border bg-primary py-8 text-center text-sm text-primary-foreground">
+    <p>© <span id="yr"></span> Snoopies Tuckshop. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    // Load and Display Orders
+    function loadOrders() {
+      const container = document.getElementById('ordersContainer');
+      const statsSection = document.getElementById('statsSection');
+      const statTotalCount = document.getElementById('statTotalCount');
+      const statTotalSpent = document.getElementById('statTotalSpent');
+
+      let orders = [];
+      try {
+        orders = JSON.parse(localStorage.getItem('tuckshop_orders') || '[]');
+      } catch (e) {
+        console.error("Failed to parse orders history:", e);
+      }
+
+      // If empty state
+      if (orders.length === 0) {
+        statsSection.classList.add('hidden');
+        document.getElementById('clearAllContainer').classList.add('hidden');
+        container.innerHTML = `
+          <div class="flex flex-col items-center justify-center text-center py-16 px-4">
+            <div class="h-32 w-32 shrink-0 rounded-full bg-[#fff7ea] flex items-center justify-center text-5xl border border-[#eedcc8] shadow-sm mb-6 animate-pulse">
+              🍔
+            </div>
+            <h2 class="text-2xl font-bold text-foreground">No pre-orders found</h2>
+            <p class="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
+              It looks like you haven't placed any pre-orders on this device yet. When you complete a checkout, your history will show up here automatically.
+            </p>
+            <a href="index.html" class="mt-8 rounded-full bg-[#b65b2b] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#9d4b1f]">
+              Browse the Menu
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      // Show stats section
+      statsSection.classList.remove('hidden');
+      document.getElementById('clearAllContainer').classList.remove('hidden');
+      statTotalCount.textContent = orders.length;
+
+      // Calculate total amount spent
+      let totalSpent = 0;
+      orders.forEach(order => {
+        const amt = parseFloat(order.total);
+        if (!isNaN(amt)) {
+          totalSpent += amt;
+        }
+      });
+      statTotalSpent.textContent = `R ${totalSpent.toFixed(2)}`;
+
+      // Sort orders descending (newest first)
+      orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      // Build cards list
+      const cardsHtml = orders.map(order => {
+        // Format Date
+        const formattedDate = formatDate(order.date);
+
+        // Parse list of food items
+        const itemLines = order.items.split('\n').filter(line => line.trim() !== '');
+        const itemsListHtml = itemLines.map(line => {
+          return `<li class="flex items-start gap-2 py-1.5 border-b border-dashed border-[#f7f3ed] last:border-0">
+            <span class="text-primary font-semibold text-sm select-none">•</span>
+            <span class="text-sm text-[#5a4637]">${escapeHTML(line)}</span>
+          </li>`;
+        }).join('');
+
+        // Clean Token string for UI
+        const displayToken = order.token || 'N/A';
+
+        return `
+          <div class="order-card mb-6 rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border pb-4">
+              <div>
+                <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider">Date Placed</p>
+                <h4 class="text-base font-bold text-foreground mt-0.5">${formattedDate}</h4>
+              </div>
+              <div class="self-start sm:self-center flex items-center gap-3">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-[#e8f5e9] border border-[#c8e6c9] px-3 py-1 text-xs font-semibold text-[#1b5e20]">
+                  <span class="h-1.5 w-1.5 rounded-full bg-[#2e7d32]"></span> Paid &amp; Confirmed
+                </span>
+                <button onclick="deleteOrder('${escapeJS(order.token || '')}', '${order.date}')" class="text-[#7a6555] hover:text-red-600 transition-colors p-1.5 rounded-lg border border-transparent hover:border-red-200 hover:bg-red-50" title="Remove this order from history">
+                  <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="py-4">
+              <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-2">Order Summary</p>
+              <ul class="space-y-0.5 bg-muted/30 rounded-xl px-4 py-2 border border-border/50">
+                ${itemsListHtml}
+              </ul>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-border mt-1">
+              <div>
+                <span class="text-xs text-muted-foreground font-medium uppercase tracking-wider block">Manager Reference Token</span>
+                <div class="flex items-center gap-2 mt-1.5">
+                  <code class="rounded bg-muted px-2 py-1 text-xs font-semibold text-foreground border border-border/70 select-all">${escapeHTML(displayToken)}</code>
+                  <button onclick="copyToken(this, '${escapeJS(displayToken)}')" class="copy-btn inline-flex items-center justify-center rounded p-1.5 bg-[#f7f3ed] border border-[#eedcc8] hover:bg-[#eedcc8] transition" aria-label="Copy token">
+                    <svg class="h-4.5 w-4.5 text-[#7a6555]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                    </svg>
+                    <span class="tooltip">Copy Token</span>
+                  </button>
+                </div>
+              </div>
+              <div class="text-left sm:text-right">
+                <span class="text-xs text-muted-foreground font-medium uppercase tracking-wider block">Total Spent</span>
+                <span class="text-2xl font-black text-foreground block mt-0.5">R ${parseFloat(order.total).toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = `<div class="max-w-3xl mx-auto">${cardsHtml}</div>`;
+    }
+
+    // Helper: format ISO date to readable string
+    function formatDate(isoStr) {
+      const d = new Date(isoStr);
+      if (isNaN(d.getTime())) return isoStr;
+      return d.toLocaleDateString('en-ZA', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
+    // Helper: HTML escape
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, m => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[m]));
+    }
+
+    // Helper: JS string escape
+    function escapeJS(str) {
+      return str.replace(/'/g, "\\'");
+    }
+
+    // Delete an individual order
+    function deleteOrder(token, date) {
+      if (!confirm("Are you sure you want to remove this pre-order from your device history?")) return;
+      let orders = [];
+      try {
+        orders = JSON.parse(localStorage.getItem('tuckshop_orders') || '[]');
+      } catch (e) {
+        console.error(e);
+      }
+      orders = orders.filter(o => !(o.token === token && o.date === date));
+      localStorage.setItem('tuckshop_orders', JSON.stringify(orders));
+      loadOrders();
+    }
+
+    // Clear all orders history
+    function clearAllOrders() {
+      if (!confirm("Are you sure you want to permanently clear your entire pre-order history? This cannot be undone.")) return;
+      localStorage.removeItem('tuckshop_orders');
+      loadOrders();
+    }
+
+    // Copy to clipboard with UI feedback
+    function copyToken(btn, token) {
+      navigator.clipboard.writeText(token).then(() => {
+        const tooltip = btn.querySelector('.tooltip');
+        if (tooltip) {
+          const origText = tooltip.textContent;
+          tooltip.textContent = 'Copied!';
+          tooltip.classList.add('active');
+          setTimeout(() => {
+            tooltip.textContent = origText;
+            tooltip.classList.remove('active');
+          }, 1500);
+        }
+      }).catch(err => {
+        console.error('Failed to copy token:', err);
+      });
+    }
+
+    // Initial load
+    window.addEventListener('DOMContentLoaded', loadOrders);
+  </script>
+</body>
+
+</html>

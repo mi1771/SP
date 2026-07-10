@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Order Summary — Snoopies Tuckshop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Yoco Web SDK -->
+<script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
+<style>
+  body{font-family:'Poppins',ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fff;}
+  .container{max-width:900px;margin:40px auto;padding:20px}
+  h1.order-summary-title {
+    color: #b65b2b;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="order-summary-title text-2xl font-semibold mb-4">Order summary</h1>
+    <div id="summaryRoot" class="rounded-lg border border-[#ecd8c8] bg-white p-4"></div>
+    <div class="mt-4 flex items-center gap-3">
+      <a href="index.html" class="rounded-lg border border-[#eedcc8] bg-white px-4 py-2 text-[#7a4f2e]">Back to menu</a>
+      <button id="proceedCheckout" class="rounded-lg bg-[#b65b2b] px-4 py-2 text-white">Proceed to checkout</button>
+    </div>
+  </div>
+<script>
+(function(){
+  const cart=JSON.parse(sessionStorage.getItem('snoop_cart')||'{}');
+  const menu=JSON.parse(sessionStorage.getItem('snoop_menu')||'[]');
+  const fmt=c=>`R ${(c/100).toFixed(2)}`;
+  const root=document.getElementById('summaryRoot');
+  if(Object.keys(cart).length===0){ root.innerHTML='<p class="text-sm text-gray-600">Your cart is empty.</p>'; return; }
+  let total=0;
+  const rows=Object.entries(cart).map(([id,q])=>{ const it=menu.find(m=>m.id===id)||{}; const price=(it.price||0)*100; total+=price*q; return `<div class="flex items-center justify-between py-2 border-b border-[#ecd8c8] last:border-b-0"><span class="text-sm text-[#7a6555]">${it.name||'Unknown'} × ${q}</span><span class="font-medium text-[#2e1a0b]">${fmt(price*q)}</span></div>`; }).join('');
+  root.innerHTML=`<div>${rows}</div><div class="mt-3 flex items-center justify-between"><strong class="text-[#2e1a0b]">Total</strong><strong class="text-[#2e1a0b]">${fmt(total)}</strong></div>`;
+  document.getElementById('proceedCheckout').addEventListener('click',()=>{ 
+    // Store total for Yoco payment
+    sessionStorage.setItem('checkout_total', (total/100).toFixed(2));
+    openYocoPayment((total/100).toFixed(2));
+  });
+})();
+
+// Yoco Payment Integration
+function openYocoPayment(amount) {
+  const publicKey = 'pk_live_33d0e29d4e654e99'; // Replace with your actual Yoco public key
+  
+  const paymentData = {
+    amount: Math.round(parseFloat(amount) * 100), // Convert to cents
+    currency: 'ZAR',
+    description: 'Snoopies Tuckshop Order'
+  };
+
+  // Initialize Yoco payment
+  yoco.showPopup(paymentData, function(result) {
+    if (result.status === 'success') {
+      alert('Payment successful! Thank you for your order.');
+      // Clear cart after successful payment
+      sessionStorage.removeItem('snoop_cart');
+      sessionStorage.removeItem('snoop_menu');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+    } else if (result.status === 'error') {
+      alert('Payment failed: ' + result.message);
+    }
+  });
+}
+</script>
+</body>
+</html>
